@@ -1,0 +1,100 @@
+Etape 1 :
+ed affiche
+
+Etape 2 :
+select name from v$datafile 
+UNION
+select member from v$logfile 
+UNION
+select name from v$controlfile 
+UNION
+select name from v$tempfile ;
+Etape 3 : 
+
+@affiche 
+
+Etape 4 : 
+ed sauve2
+
+
+
+shutdown 
+
+host copy C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\* c:\backup
+
+startup 
+
+Etape 5 :
+
+shutdown 
+
+host del C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\*
+
+startup 
+
+Etape 6 :
+conn / as sysdba;
+
+select  instance_name, status, version, from v$instance;
+Etape 7  : 
+
+shutdown 
+
+host copy c:\backup\* C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\
+
+startup 
+
+Etape 8 :
+
+select group#,sequence#, status from v$log;
+
+Etape 9 : 
+alter system switch logfile;
+Etape 10 :
+
+select member from v$logfile;
+
+
+Ecchec s'instance par suppresioon de redologfile 
+
+Etape 11 :
+
+shutdown 
+
+host del C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\REDO03.LOG
+host del C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\REDO02.LOG
+host del C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\REDO01.LOG
+
+startup
+
+
+Etape 12 :
+recover database using backup controlfile until cancel;
+cancel;
+
+Etape 13 : 
+
+
+alter database open resetlogs;
+
+Etape 14 : 
+
+select log_mode from v$database;
+
+Etape 15 : 
+
+shutdown immediate 
+
+
+startup mount;
+alter database archivelog;
+
+alter database open;
+
+Etape 16 :
+
+alter database begin backup
+
+host copy C:\ORACLE\PRODUCT\10.2.0\ORADATA\ORCL\* c:\backup
+
+alter database end backup
